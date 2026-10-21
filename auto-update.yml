@@ -2,7 +2,6 @@ name: QuantEdge Scraper & Refresh
 
 on:
   schedule:
-    # Runs every day at 23:00 UTC (Midnight WAT)
     - cron: '0 23 * * *'
   workflow_dispatch:
 
@@ -31,9 +30,7 @@ jobs:
           python scraper.py
 
       - name: Commit and push fresh JSON dataset
-        run: |
-          git config --global user.name "QuantEdge Bot"
-          git config --global user.email "bot@quantedge.site"
-          git add fixtures.json
-          git commit -m "QuantEdge automated dataset refresh: $(date +'%Y-%m-%d')" || exit 0
-          git push
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "QuantEdge automated dataset refresh: fixtures.json"
+          file_pattern: "fixtures.json"
