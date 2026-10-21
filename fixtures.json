@@ -1,0 +1,72 @@
+[
+  {
+    "id": 1,
+    "sport": "FOOTBALL",
+    "comp": "UEFA Champions League",
+    "home": "Real Madrid",
+    "away": "AC Milan",
+    "date": "2026-10-21",
+    "time": "20:00 WAT",
+    "homeGoals": 1.5,
+    "awayGoals": 0.8,
+    "prob": 85.0,
+    "market": "Home Win (1X2)",
+    "odds": 1.45
+  },
+  {
+    "id": 2,
+    "sport": "FOOTBALL",
+    "comp": "UEFA Champions League",
+    "home": "Bayern Munich",
+    "away": "Club Brugge",
+    "date": "2026-10-21",
+    "time": "20:00 WAT",
+    "homeGoals": 2.1,
+    "awayGoals": 0.4,
+    "prob": 88.0,
+    "market": "Over 2.5 Goals",
+    "odds": 1.35
+  },
+  {
+    "id": 3,
+    "sport": "BASKETBALL",
+    "comp": "EuroLeague",
+    "home": "Real Madrid Baloncesto",
+    "away": "Olimpia Milano",
+    "date": "2026-10-21",
+    "time": "19:00 WAT",
+    "homeGoals": 87.2,
+    "awayGoals": 78.5,
+    "prob": 84.5,
+    "market": "Home Win (Incl. OT)",
+    "odds": 1.38
+  },
+  {
+    "id": 4,
+    "sport": "BASKETBALL",
+    "comp": "NBA Regular Season",
+    "home": "Boston Celtics",
+    "away": "New York Knicks",
+    "date": "2026-10-21",
+    "time": "00:30 WAT",
+    "homeGoals": 113.8,
+    "awayGoals": 107.0,
+    "prob": 82.0,
+    "market": "Over 210.5 Total Points",
+    "odds": 1.42
+  },
+  {
+    "id": 5,
+    "sport": "HOCKEY",
+    "comp": "NHL",
+    "home": "Edmonton Oilers",
+    "away": "Calgary Flames",
+    "date": "2026-10-21",
+    "time": "02:00 WAT",
+    "homeGoals": 4.0,
+    "awayGoals": 2.2,
+    "prob": 86.0,
+    "market": "Over 4.5 Goals",
+    "odds": 1.30
+  }
+]
