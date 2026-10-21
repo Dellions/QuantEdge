@@ -1,0 +1,39 @@
+name: QuantEdge Scraper & Refresh
+
+on:
+  schedule:
+    # Runs every day at 23:00 UTC (Midnight WAT)
+    - cron: '0 23 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  scrape-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests
+
+      - name: Run QuantEdge Quantitative Engine
+        run: |
+          python scraper.py
+
+      - name: Commit and push fresh JSON dataset
+        run: |
+          git config --global user.name "QuantEdge Bot"
+          git config --global user.email "bot@quantedge.site"
+          git add fixtures.json
+          git commit -m "QuantEdge automated dataset refresh: $(date +'%Y-%m-%d')" || exit 0
+          git push
