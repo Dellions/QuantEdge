@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuantEdge | Quantitative Multi-Sport Prediction Engine</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        darkBg: '#0b0f19', cardBg: '#131b2e', borderCol: '#1e293b',
+                        accentGreen: '#10b981', accentBlue: '#3b82f6', accentPurple: '#8b5cf6'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #0b0f19; color: #f8fafc; }
+        .glass-card { background: rgba(19, 27, 46, 0.75); backdrop-filter: blur(12px); border: 1px solid rgba(30, 41, 59, 0.7); }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 3px; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col selection:bg-blue-500 selection:text-white">
+
+    <!-- HEADER -->
+    <header class="border-b border-borderCol bg-darkBg/90 sticky top-0 z-50 backdrop-blur-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="bg-gradient-to-tr from-blue-600 to-indigo-500 p-2 rounded-xl text-white font-black text-xl tracking-wider shadow-lg shadow-blue-500/20">QE</div>
+                <div>
+                    <h1 class="font-extrabold text-lg tracking-tight text-white">QUANTEDGE <span class="text-xs px-2 py-0.5 rounded bg-blue-500/20 text-blue-400 font-semibold border border-blue-500/30">v4.0 ALPHA</span></h1>
+                    <p class="text-xs text-slate-400">Flashscore & SportyBet Quantitative Modeling Engine</p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-3">
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                    <span class="w-2 h-2 mr-1.5 bg-emerald-400 rounded-full animate-pulse"></span> Live Sync Active
+                </span>
+                <button onclick="loadFixtures()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold px-3 py-2 rounded-lg border border-borderCol transition">
+                    🔄 Refresh Data
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+
+        <!-- STATS BANNER -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="glass-card p-4 rounded-xl border-l-4 border-l-blue-500">
+                <p class="text-xs text-slate-400 font-medium uppercase tracking-wider">Active Scraped Fixtures</p>
+                <p id="statTotalFixtures" class="text-2xl font-black text-white mt-1">0</p>
+            </div>
+            <div class="glass-card p-4 rounded-xl border-l-4 border-l-emerald-500">
+                <p class="text-xs text-slate-400 font-medium uppercase tracking-wider">Bankers (&ge;85%)</p>
+                <p id="statBankers" class="text-2xl font-black text-emerald-400 mt-1">0</p>
+            </div>
+            <div class="glass-card p-4 rounded-xl border-l-4 border-l-amber-500">
+                <p class="text-xs text-slate-400 font-medium uppercase tracking-wider">Keeps (76-84%)</p>
+                <p id="statKeeps" class="text-2xl font-black text-amber-400 mt-1">0</p>
+            </div>
+            <div class="glass-card p-4 rounded-xl border-l-4 border-l-purple-500">
+                <p class="text-xs text-slate-400 font-medium uppercase tracking-wider">Target Acca Range</p>
+                <p class="text-2xl font-black text-purple-400 mt-1">~5x to ~20x</p>
+            </div>
+        </div>
+
+        <!-- NAVIGATION TABS -->
+        <div class="flex flex-wrap items-center justify-between gap-4 border-b border-borderCol pb-4">
+            <div class="flex space-x-2 overflow-x-auto pb-2 sm:pb-0">
+                <button onclick="filterSport('ALL')" id="tab-ALL" class="sport-tab px-4 py-2 rounded-lg text-xs font-bold transition bg-blue-600 text-white shadow-md">All Sports</button>
+                <button onclick="filterSport('FOOTBALL')" id="tab-FOOTBALL" class="sport-tab px-4 py-2 rounded-lg text-xs font-bold transition bg-slate-800 text-slate-300 hover:bg-slate-700">⚽ Football</button>
+                <button onclick="filterSport('BASKETBALL')" id="tab-BASKETBALL" class="sport-tab px-4 py-2 rounded-lg text-xs font-bold transition bg-slate-800 text-slate-300 hover:bg-slate-700">🏀 Basketball (HT)</button>
+                <button onclick="filterSport('HOCKEY')" id="tab-HOCKEY" class="sport-tab px-4 py-2 rounded-lg text-xs font-bold transition bg-slate-800 text-slate-300 hover:bg-slate-700">🏒 Ice Hockey</button>
+                <button onclick="filterSport('HANDBALL')" id="tab-HANDBALL" class="sport-tab px-4 py-2 rounded-lg text-xs font-bold transition bg-slate-800 text-slate-300 hover:bg-slate-700">🤾 Handball</button>
+            </div>
+            <div class="flex items-center space-x-2">
+                <button onclick="switchView('fixtures')" id="viewBtn-fixtures" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-blue-500/20 text-blue-400 border border-blue-500/30">📋 Match Feed</button>
+                <button onclick="switchView('accas')" id="viewBtn-accas" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-800 text-slate-300 hover:bg-slate-700">🎯 Targeted Accas (~5x-20x)</button>
+            </div>
+        </div>
+
+        <!-- FIXTURES VIEW -->
+        <div id="view-fixtures" class="space-y-4">
+            <div id="fixturesList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+        </div>
+
+        <!-- ACCUMULATOR BUILDER VIEW -->
+        <div id="view-accas" class="hidden space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6" id="accasContainer"></div>
+        </div>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="border-t border-borderCol bg-darkBg/95 py-6 mt-12 text-center text-xs text-slate-500 space-y-2">
+        <p>QuantEdge Quantitative Engine &bull; Automated Flashscore & SportyBet Pipeline &bull; NFA</p>
+    </footer>
+
+    <script>
+        const TODAY_DATE = "2026-10-21";
+        let rawFixtures = [];
+        let currentFilter = 'ALL';
+
+        async function loadFixtures() {
+            try {
+                const response = await fetch('./fixtures.json?v=' + new Date().getTime());
+                if (response.ok) {
+                    rawFixtures = await response.json();
+                    initEngine();
+                } else {
+                    console.warn("fixtures.json not found.");
+                }
+            } catch (error) {
+                console.error("Error loading JSON:", error);
+            }
+        }
+
+        function initEngine() {
+            renderFixtures();
+            updateStats();
+            generateAccas();
+        }
+
+        function filterSport(sport) {
+            currentFilter = sport;
+            document.querySelectorAll('.sport-tab').forEach(btn => btn.className = "sport-tab px-4 py-2 rounded-lg text-xs font-bold transition bg-slate-800 text-slate-300 hover:bg-slate-700");
+            document.getElementById(`tab-${sport}`).className = "sport-tab px-4 py-2 rounded-lg text-xs font-bold transition bg-blue-600 text-white shadow-md";
+            renderFixtures();
+        }
+
+        function switchView(view) {
+            if (view === 'fixtures') {
+                document.getElementById('view-fixtures').classList.remove('hidden');
+                document.getElementById('view-accas').classList.add('hidden');
+                document.getElementById('viewBtn-fixtures').className = "px-3 py-1.5 rounded-lg text-xs font-bold bg-blue-500/20 text-blue-400 border border-blue-500/30";
+                document.getElementById('viewBtn-accas').className = "px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-800 text-slate-300 hover:bg-slate-700";
+            } else {
+                document.getElementById('view-fixtures').classList.add('hidden');
+                document.getElementById('view-accas').classList.remove('hidden');
+                document.getElementById('viewBtn-accas').className = "px-3 py-1.5 rounded-lg text-xs font-bold bg-blue-500/20 text-blue-400 border border-blue-500/30";
+                document.getElementById('viewBtn-fixtures').className = "px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-800 text-slate-300 hover:bg-slate-700";
+                generateAccas();
+            }
+        }
+
+        function getVerdict(prob) {
+            if (prob >= 85) return { label: "BANKER", bg: "bg-emerald-500/20 text-emerald-400 border-emerald-500/30" };
+            if (prob >= 76) return { label: "KEEP", bg: "bg-amber-500/20 text-amber-400 border-amber-500/30" };
+            return { label: "KILL", bg: "bg-red-500/20 text-red-400 border-red-500/30" };
+        }
+
+        function renderFixtures() {
+            const container = document.getElementById('fixturesList');
+            container.innerHTML = '';
+            const filtered = currentFilter === 'ALL' ? rawFixtures : rawFixtures.filter(f => f.sport === currentFilter);
+
+            filtered.forEach(f => {
+                const v = getVerdict(f.prob);
+                const card = document.createElement('div');
+                card.className = "glass-card p-5 rounded-2xl flex flex-col justify-between space-y-4 hover:border-slate-700 transition";
+                card.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <span class="text-[10px] font-bold px-2.5 py-1 rounded bg-slate-800 text-slate-300 uppercase">${f.comp}</span>
+                        <span class="text-xs px-2.5 py-1 rounded-md font-extrabold border ${v.bg}">${v.label} (${f.prob}%)</span>
+                    </div>
+                    <div class="space-y-1">
+                        <div class="flex justify-between items-center text-sm font-bold text-white">
+                            <span>${f.home}</span><span class="text-xs text-slate-500 font-normal">vs</span><span>${f.away}</span>
+                        </div>
+                        <p class="text-xs text-slate-400">${f.sport === 'BASKETBALL' ? '🏀 Stat & HT Model' : '⚽ Flashscore Statistical Model'}</p>
+                    </div>
+                    <div class="bg-slate-900/60 p-3 rounded-xl border border-borderCol flex items-center justify-between">
+                        <div><p class="text-[10px] text-slate-400 uppercase">Market</p><p class="text-xs font-bold text-blue-400 mt-0.5">${f.market}</p></div>
+                        <div class="text-right"><p class="text-[10px] text-slate-400 uppercase">SportyBet Odds</p><p class="text-xs font-extrabold text-emerald-400 mt-0.5">@ ${f.odds.toFixed(2)}</p></div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function updateStats() {
+            document.getElementById('statTotalFixtures').innerText = rawFixtures.length;
+            document.getElementById('statBankers').innerText = rawFixtures.filter(f => f.prob >= 85).length;
+            document.getElementById('statKeeps').innerText = rawFixtures.filter(f => f.prob >= 76 && f.prob < 85).length;
+        }
+
+        function generateAccas() {
+            const container = document.getElementById('accasContainer');
+            container.innerHTML = '';
+            const bankers = rawFixtures.filter(f => f.prob >= 85);
+            const keeps = rawFixtures.filter(f => f.prob >= 76);
+
+            const tiers = [
+                { name: "Tier 1: Balanced Acca (~5x)", legs: bankers.slice(0, 5), sub: "High-confidence bankers (≥85%)" },
+                { name: "Tier 2: Growth Acca (~10x)", legs: [].concat(bankers.slice(0, 3), keeps.slice(0, 3)), sub: "Bankers + Vetted Keeps mix" },
+                { name: "Tier 3: Elite Acca (~20x)", legs: rawFixtures.filter(f => f.prob >= 75).slice(0, 8), sub: "Full quantitative market spread" }
+            ];
+
+            tiers.forEach(tier => {
+                if (tier.legs.length === 0) return;
+                const combinedOdds = tier.legs.reduce((acc, l) => acc * l.odds, 1);
+                const jointProb = tier.legs.reduce((acc, l) => acc * (l.prob / 100), 1) * 100;
+                
+                let legsHtml = tier.legs.map(l => `
+                    <div class="flex justify-between items-center text-xs border-b border-borderCol/50 pb-2">
+                        <div><span class="font-bold text-white">${l.home} vs ${l.away}</span><p class="text-slate-400">${l.market}</p></div>
+                        <div class="text-right"><span class="text-emerald-400 font-bold">@${l.odds.toFixed(2)}</span><p class="text-[10px] text-slate-500">${l.prob}%</p></div>
+                    </div>
+                `).join('');
+
+                const card = document.createElement('div');
+                card.className = "glass-card p-5 rounded-2xl flex flex-col justify-between space-y-4 border border-borderCol";
+                card.innerHTML = `
+                    <div class="border-b border-borderCol pb-3"><h3 class="font-bold text-sm text-white">${tier.name}</h3><p class="text-[10px] text-slate-400">${tier.sub}</p></div>
+                    <div class="space-y-2">${legsHtml}</div>
+                    <div class="bg-slate-900/60 p-3 rounded-xl border border-borderCol flex justify-between items-center">
+                        <div><p class="text-[10px] text-slate-400 uppercase">Combined Odds</p><p class="text-base font-black text-emerald-400">${combinedOdds.toFixed(2)}x</p></div>
+                        <div class="text-right"><p class="text-[10px] text-slate-400 uppercase">Joint Probability</p><p class="text-base font-black text-blue-400">${jointProb.toFixed(1)}%</p></div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        window.onload = loadFixtures;
+    </script>
+</body>
+</html>
